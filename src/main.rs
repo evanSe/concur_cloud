@@ -38,6 +38,11 @@ fn index() -> io::Result<NamedFile> {
     NamedFile::open("fe/index.html")
 }
 
+#[get("/<file..>")]
+fn files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("fe/").join(file)).ok()
+}
+
 #[get("/showdir")]
 fn get_dir() -> Json<Directory> {
     // get fcurrent dirrectory name
@@ -85,6 +90,6 @@ fn get_file(name: String) -> Option<String> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, get_dir, get_file])
+        .mount("/", routes![index, get_dir, get_file, files])
         .launch();
 }
