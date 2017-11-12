@@ -13,9 +13,12 @@ use rocket_contrib::Json;
 use std::string::String;
 use std::str;
 use std::vec::Vec;
+use std::io;
 use std::io::BufReader;
 use std::io::prelude::*;
 use rocket::http::Status;
+use std::path::{Path, PathBuf};
+use rocket::response::NamedFile;
 
 #[derive(Serialize, Deserialize)]
 struct User {
@@ -31,8 +34,8 @@ struct Directory {
 }
 
 #[get("/")]
-fn index() -> &'static str {
-    "Return index.html"
+fn index() -> io::Result<NamedFile> {
+    NamedFile::open("fe/index.html")
 }
 
 #[get("/showdir")]
