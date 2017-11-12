@@ -13,6 +13,8 @@ use std::str;
 use std::path::PathBuf;
 use std::env;
 use std::vec::Vec;
+use std::io::BufReader;
+use std::io::prelude::*;
 
 #[derive(Serialize, Deserialize)]
 struct User {
@@ -28,12 +30,14 @@ struct Directory {
 }
 
 #[get("/")]
-fn index() -> &'static str {
+fn index() -> &'static str
+{
     "Return index.html"
 }
 
 #[get("/showdir")]
-fn get_dir() -> Json<Directory> {
+fn get_dir() -> Json<Directory>
+{
    
     let dir_name = String::from(util::curr_dir().to_str().unwrap());
     let mut entries: Vec<String> = Vec::new();
@@ -42,9 +46,11 @@ fn get_dir() -> Json<Directory> {
     for entry in dir {
         match entry {
             Ok (e) => {
-                let path = &e.path();
-                let file_name = path.file_name().unwrap().to_str().unwrap();
-                entries.push(String::from(file_name));
+                if e.path().is_file() {
+                    let path = &e.path();
+                    let file_name = path.file_name().unwrap().to_str().unwrap();
+                    entries.push(String::from(file_name));
+                }
             },
             Err(why) => {
                 println!("! {:?}", why.kind());
@@ -54,6 +60,16 @@ fn get_dir() -> Json<Directory> {
     return Json(Directory { dir_name: dir_name, dir_entries: entries});
 }
 
+#[get("/file/<name>")]
+fn get_file(name: String) -> String
+{
+    let current_dir = util::curr_dir().join(name);
+    let mut buf_reader = BufReader::new(util::fs::read::read_file(&current_dir));
+    let mut contents = String::new();
+    buf_reader.read_to_string(&mut contents);
+    contents
+}
+
 fn main() {
-    rocket::ignite().mount("/", routes![index, get_dir]).launch();
+    rocket::ignite().mount("/", routes![index, get_dir, get_file]).launch();
 }
