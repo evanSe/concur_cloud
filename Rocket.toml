@@ -1,0 +1,9 @@
+[development]
+address = "45.55.247.112"
+workers = 1
+log = "normal"
+
+[production]
+address = "45.55.247.112"
+workers = 1
+log = "normal"
