@@ -33,6 +33,12 @@ struct Directory {
     dir_entries: Vec<String>,
 }
 
+#[derive(Serialize, Deserialize)]
+struct File {
+    file_name: String,
+    file_contents: String,
+}
+
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
     NamedFile::open("fe/index.html")
@@ -70,8 +76,8 @@ fn get_dir() -> Json<Directory> {
 }
 
 #[get("/file/<name>")]
-fn get_file(name: String) -> Option<String> {
-    let current_dir = util::curr_dir().join(name);
+fn get_file(name: String) -> Option<Json<File>> {
+    let current_dir = util::curr_dir().join(&name);
 
     match util::fs::read::read_file(
         &current_dir
@@ -83,7 +89,10 @@ fn get_file(name: String) -> Option<String> {
             let mut buf_reader = BufReader::new(f);
             let mut contents = String::new();
             buf_reader.read_to_string(&mut contents);
-            Some(contents)
+            Some(Json(File {
+                file_name: name,
+                file_contents: contents,
+            }))
         }
     }
 }
