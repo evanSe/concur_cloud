@@ -36,7 +36,7 @@ struct Directory {
 #[derive(Serialize, Deserialize)]
 struct File {
     file_name: String,
-    file_contents: String,
+    file_contents: Vec<String>,
 }
 
 #[get("/")]
@@ -87,11 +87,19 @@ fn get_file(name: String) -> Option<Json<File>> {
         }
         Some(f) => {
             let mut buf_reader = BufReader::new(f);
-            let mut contents = String::new();
-            buf_reader.read_to_string(&mut contents);
+            let mut entries: Vec<String> = Vec::new();
+            for line in buf_reader.lines() {
+                match line  {
+                    Ok(l) => {
+                        entries.push(l);
+                    },
+                    Err(_) => {
+                    }
+                }
+            }
             Some(Json(File {
                 file_name: name,
-                file_contents: contents,
+                file_contents: entries,
             }))
         }
     }
