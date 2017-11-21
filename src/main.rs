@@ -49,9 +49,16 @@ fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("fe/").join(file)).ok()
 }
 
-#[get("/status")]
-fn status() -> String {
-    String::from("Alive")
+#[derive(Serialize, Deserialize)]
+struct Workspace {
+    id: String,
+}
+
+#[get("/check_in")]
+fn check_in() -> Json<Workspace> {
+    return Json(Workspace {
+        id: util::hash::hash_time().to_string(),
+    });
 }
 
 #[get("/showdir")]
@@ -112,6 +119,6 @@ fn get_file(name: String) -> Option<Json<File>> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, get_dir, get_file, files, status])
+        .mount("/", routes![index, get_dir, get_file, files, check_in])
         .launch();
 }
