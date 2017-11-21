@@ -49,6 +49,11 @@ fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("fe/").join(file)).ok()
 }
 
+#[get("/status")]
+fn status() -> String {
+    String::from("Alive")
+}
+
 #[get("/showdir")]
 fn get_dir() -> Json<Directory> {
     // get fcurrent dirrectory name
@@ -107,6 +112,6 @@ fn get_file(name: String) -> Option<Json<File>> {
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index, get_dir, get_file, files])
+        .mount("/", routes![index, get_dir, get_file, files, status])
         .launch();
 }
