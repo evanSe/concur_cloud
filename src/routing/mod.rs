@@ -1,4 +1,4 @@
-// temp file for our routes
+// a temporary file for our routes
 use util;
 
 use std::io;
@@ -48,7 +48,7 @@ pub fn files(file: PathBuf) -> Option<NamedFile> {
 
 #[get("/showdir")]
 pub fn get_dir() -> Json<Directory> {
-    // get fcurrent dirrectory name
+    // get fcurrent directory name
     let dir_name = String::from(util::curr_dir().to_str().unwrap());
     let mut entries: Vec<String> = Vec::new();
 
